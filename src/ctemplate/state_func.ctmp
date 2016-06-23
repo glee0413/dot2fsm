@@ -1,0 +1,11 @@
+
+static int s_timeout; 
+static int entry_action(const struct ge_fsm_state* pre_status){
+	
+}
+
+static int exit_action(fsm_event_st* event){
+	
+}
+
+

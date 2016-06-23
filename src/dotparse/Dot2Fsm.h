@@ -24,9 +24,7 @@ public:
 			this->m_eventName = event;
 			this->m_nextState = nextState;
 		}
-		StateTransfer(){
-
-		}
+		StateTransfer(){}
 	private:
 		string m_eventName;
 		string m_nextState;

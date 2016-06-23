@@ -1,0 +1,25 @@
+/*
+ * state.h
+ *
+ *  Created on: $date$
+ *  Author: $author$
+ */
+ 
+#include "../fsm.h"
+#include "./$fsm_state_h$"
+ 
+static ge_fsm_state_st s_$fsmName$_state[$state_max$];
+static int s_init = 0;
+static void init_state(){
+	if(s_init != 0)
+		return;
+	$state_init_list$
+	s_init = 1;
+}
+ 
+ge_fsm_state_st* get_$fsmName$_init_state($fsmName$$state$ state){
+	if(state > E_$state_max$)
+		return NULL;
+	init_state();
+	return s_$fsmName$_state[state];
+}

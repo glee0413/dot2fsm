@@ -1,0 +1,23 @@
+/*
+ * state.h
+ *
+ *  Created on: $date$
+ *  Author: $author$
+ */
+
+#ifndef __$fsmName$_$state$_H__
+#define __$fsmName$_$state$_H__
+
+enum $fsmName$$state${
+	E_$state_list$
+	E_$state_max$,
+};
+
+enum $fsmName$$event${
+	E_$event_list$
+	E_$event_max$,
+};
+
+extern ge_fsm_state_st* get_$fsmName$_init_state($fsmName$$state$ state);
+
+#endif /* __$fsmName$_$state$_H__ */

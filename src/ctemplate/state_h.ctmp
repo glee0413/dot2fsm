@@ -1,0 +1,8 @@
+/*
+ * state.h
+ *
+ *  Created on: $date$
+ *  Author: $author$
+ */
+ 
+ extern void $fsmName$_init_$state$_func(ge_fsm_state_st* state);

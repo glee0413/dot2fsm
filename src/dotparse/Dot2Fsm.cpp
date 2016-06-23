@@ -35,18 +35,18 @@ Dot2Fsm::parseDotFile(const char* dotFile){
 	fp = fopen(dotFile, "r");
 	if (!fp){
 		printf("Open file %s failed: reason :%s\n",dotFile,strerror(errno));
-		return 0;
+		return -1;
 	}
 	g = agread(fp, 0);
 	if (!g) {
 		printf("parse file failed");
-		return 0;
+		return -1;
 	}
 
 	if (!agisdirected(g)) {
 		printf("dot file must directed graph\n");
 		agclose(g);
-		return 0;
+		return -1;
 	}
 
 	this->m_fsmName = agnameof(g);
@@ -55,7 +55,7 @@ Dot2Fsm::parseDotFile(const char* dotFile){
 		if(this->m_stateTransfer.find(agnameof(np)) != this->m_stateTransfer.end()){
 			printf("Node is exist\n");
 			agclose(g);
-			return 0;
+			return -1;
 		}
 		this->m_stateTransfer[agnameof(np)] = vector<StateTransfer>();
 		for (ep = agfstedge(g, np); ep; ep = agnxtedge(g, ep, np)){

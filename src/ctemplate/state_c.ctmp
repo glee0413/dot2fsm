@@ -1,0 +1,30 @@
+/*
+ * state.h
+ *
+ *  Created on: $date$
+ *  Author: $author$
+ */
+
+#include "../fsm.h" 
+#include "$state$_func.c"
+ 
+static const char* s_fsm_name = "$state$"; 
+
+static ge_fsm_state_st* get_next_status(int event_id){
+	$switch_next_status$
+}
+
+int do_action(fsm_event_st* event){
+	$swith_event_function$
+}
+
+void $fsmName$_init_$state$_func(ge_fsm_state_st* state){
+	state->name = s_fsm_name;
+	state->get_next_status = get_next_status;
+	state->do_action = do_action;
+	state->entry_action = entry_action;
+	state->exit_action = exit_action;
+	state->timeout = s_timeout;
+ }
+ 
+ 
