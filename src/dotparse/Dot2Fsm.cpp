@@ -13,6 +13,13 @@
 #include <string.h>
 #include <graphviz/gvc.h>
 
+extern const char fsm_c[];
+extern const char fsm_h[];
+extern const char state_c[];
+extern const char state_func[];
+extern const char state_h[];
+
+
 Dot2Fsm::Dot2Fsm() {
 	// TODO Auto-generated constructor stub
 	m_stateCount = 0;
