@@ -24,6 +24,10 @@ public:
 			this->m_eventName = event;
 			this->m_nextState = nextState;
 		}
+		StateTransfer(const string& event, const string& nextState) {
+			this->m_eventName = event;
+			this->m_nextState = nextState;
+		}
 		StateTransfer(){}
 	private:
 		string m_eventName;
@@ -33,11 +37,18 @@ public:
 	};
 public:
 	int parseDotFile(const char* dotFile);
+	int generalFSMCode(int language);
+private:
+	int generalFSMCode_C();
+	int createFSMDir();
+	int buildReplaceString(map<int,string>& replace_str);
 private:
 	int m_stateCount;
 	string m_fsmName;
 	vector<string> m_stateList;
+	vector<string> m_eventList;
 	map<string,vector<StateTransfer> > m_stateTransfer;
+	vector<string> m_stateFileName;
 };
 
 #endif /* SRC_DOTPARSE_DOT2FSM_H_ */

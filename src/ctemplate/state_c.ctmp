@@ -18,7 +18,7 @@ int do_action(fsm_event_st* event){
 	$swith_event_function$
 }
 
-void $fsmName$_init_$state$_func(ge_fsm_state_st* state){
+void $fsmName_init_state_func$(ge_fsm_state_st* state){
 	state->name = s_fsm_name;
 	state->get_next_status = get_next_status;
 	state->do_action = do_action;

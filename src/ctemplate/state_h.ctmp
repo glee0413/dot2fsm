@@ -5,5 +5,5 @@
  *  Author: $author$
  */
  
- extern void $fsmName$_init_$state$_func(ge_fsm_state_st* state);
+ extern void $fsmName_init_state_func$(ge_fsm_state_st* state);
  

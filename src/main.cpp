@@ -10,19 +10,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-enum FSM_LANGUAGE{
-	FL_C_LANGUAGE = 0,
-	FL_CPP_LANGUAGE,
-	FL_MAX
-};
+#include <utils/macro.h>
 
 int
 main(int argc,char* argv[]){
 	Dot2Fsm dot2fsm;
 	int opt;
 	int language = 0;
-	char dot_file[56] = {0};
+	char dot_file[56] = "fsm.dot";
 
 
 
@@ -44,7 +39,10 @@ main(int argc,char* argv[]){
 		}
 	}
 
-	dot2fsm.parseDotFile(dot_file);
+	if(dot2fsm.parseDotFile(dot_file) == 0){
+		dot2fsm.generalFSMCode(language);
+	}
+
 
 	return 0;
 }
