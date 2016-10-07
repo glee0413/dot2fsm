@@ -20,12 +20,13 @@ typedef struct ge_fsm_event{
 	int event_id;
 	void* data;
 	int len;
+	void* result;
 } fsm_event_st;
 
 typedef struct ge_fsm_state{
 	int state_id;
 	char* name;
-	ge_fsm_state_st* (*get_next_status)(int event_id);
+	struct ge_fsm_state* (*get_next_status)(int event_id);
 	int (*do_action)(fsm_event_st* event);
 	int (*entry_action)(const struct ge_fsm_state* pre_status);
 	int (*exit_action)(fsm_event_st* event);

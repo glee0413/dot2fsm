@@ -221,6 +221,67 @@ int Dot2Fsm::buildReplaceString(map<int,string>& replace_str){
 	return 0;
 }
 
+int Dot2Fsm::generalStateCode_C(){
+	map<int,string> replace_str;
+
+	if(chdir(this->m_fsmName.c_str())){
+		printf("change directory %s failed\n",this->m_fsmName.c_str());
+		return -1;
+	}
+
+
+
+	for (vector<string>::iterator it = this->m_stateFileName.begin();
+				it != this->m_stateFileName.end(); it++) {
+
+		string filename = *it + "_state.h";
+		fstream local_state_h(filename.c_str(), ios::out);
+
+		filename = *it + "_state.c";
+		fstream local_state_c(filename.c_str(), ios::out);
+
+		filename = *it + "_state_func.c";
+		fstream local_state_func_c(filename.c_str(), ios::out);
+
+		string str_state_h = state_h;
+		string str_state_c = state_c;
+		string str_state_func = state_func;
+
+		replace_str[EFTT_STATE_C_STATE_NAME] = *it;
+		//this->m_stateTransfer
+		vector<StateTransfer> stateTransfer = this->m_stateTransfer[*it];
+		for(vector<StateTransfer>::iterator iter = stateTransfer.begin();
+				iter != stateTransfer.end();iter++){
+			//"case a: b; break;"
+			replace_str[EFTT_STATE_C_SWITCH_NEXT_STATUS] = "\tcase ";
+			replace_str[EFTT_STATE_C_SWITCH_NEXT_STATUS] += iter->EventName();
+			replace_str[EFTT_STATE_C_SWITCH_NEXT_STATUS] += ":\n\t\treturn ";
+			replace_str[EFTT_STATE_C_SWITCH_NEXT_STATUS] += iter->NextState();
+			replace_str[EFTT_STATE_C_SWITCH_NEXT_STATUS] += ";";
+
+			replace_str[EFTT_STATE_C_EVENT_HANDLER] = "\tcase ";
+			replace_str[EFTT_STATE_C_EVENT_HANDLER] += iter->EventName() + ":\nt\treturn ";
+			replace_str[EFTT_STATE_C_EVENT_HANDLER] += iter->EventName();
+			replace_str[EFTT_STATE_C_EVENT_HANDLER] += "_handler(event);";
+		}
+		//TODO:change real timeout
+		replace_str[EFTT_STATE_C_STATE_TIMEOUT] += "-1";
+
+		for(int i = EFIT_STATE_START;i < EFIT_STATE_END; i++){
+			StringUtils::replaceAll(str_state_h,fsm_template_token[i],replace_str[i]);
+			StringUtils::replaceAll(str_state_c,fsm_template_token[i],replace_str[i]);
+			StringUtils::replaceAll(str_state_func,fsm_template_token[i],replace_str[i]);
+
+		}
+	}
+
+//	switch(i){
+//	case 1:
+//		break;
+//	}
+	return 0;
+}
+
 int Dot2Fsm::generalFSMCode_C(){
 
 	if(createFSMDir()){
@@ -250,16 +311,17 @@ int Dot2Fsm::generalFSMCode_C(){
 
 	buildReplaceString(replace_str);
 
-	for(int i = 0 ; i < EFTT_FSM_MAX ; i++){
+	for(int i = 0 ; i < EFTT_FSM_END ; i++){
 		StringUtils::replaceAll(str_fsm_h,fsm_template_token[i],replace_str[i]);
 		StringUtils::replaceAll(str_fsm_c,fsm_template_token[i],replace_str[i]);
-
 	}
 
 	local_fsm_h << str_fsm_h;
 	local_fsm_c << str_fsm_c;
 	local_fsm_h.close();
 	local_fsm_c.close();
+
+	this->generalStateCode_C();
 	return 0;
 
 	return 0;

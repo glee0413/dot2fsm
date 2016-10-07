@@ -1,5 +1,4 @@
-
-static int s_timeout; 
+//at least timeout process
 static int entry_action(const struct ge_fsm_state* pre_status){
 	
 }
@@ -7,5 +6,6 @@ static int entry_action(const struct ge_fsm_state* pre_status){
 static int exit_action(fsm_event_st* event){
 	
 }
+
 
 

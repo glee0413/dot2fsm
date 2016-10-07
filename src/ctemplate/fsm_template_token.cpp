@@ -14,6 +14,12 @@ const char* fsm_template_token[] ={
 		"$INCLUDE_STATE_HEADER_LIST$",
 		"$s_fsmName_state$",
 		"$state_init_func_list$",
+
 		"$fsmName_init_state_func$",
+
+		"$state_name$",
+		"$switch_next_status$",
+		"$event_handler$",
+		"$state_timeout$",
 };
 

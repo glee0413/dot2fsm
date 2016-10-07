@@ -17,14 +17,15 @@ main(int argc,char* argv[]){
 	Dot2Fsm dot2fsm;
 	int opt;
 	int language = 0;
-	char dot_file[56] = "fsm.dot";
+	string dot_file = "fsm.dot";
+	string prefix;
 
 
-
-	while ((opt = getopt(argc, argv, "d:t:")) != -1) {
+	while ((opt = getopt(argc, argv, "d:t:p:")) != -1) {
 		switch (opt) {
 		case 'd':
-			strncpy(dot_file,optarg,sizeof(dot_file) - 1);
+			//strncpy(dot_file,optarg,sizeof(dot_file) - 1);
+			dot_file = optarg;
 			break;
 		case 't':
 			if(strcmp(optarg,"c")){
@@ -36,10 +37,14 @@ main(int argc,char* argv[]){
 				return 0;
 			}
 			break;
+		case 'p':
+			prefix = optarg;
+		default:
+			break;
 		}
 	}
 
-	if(dot2fsm.parseDotFile(dot_file) == 0){
+	if(dot2fsm.parseDotFile(dot_file.c_str()) == 0){
 		dot2fsm.generalFSMCode(language);
 	}
 

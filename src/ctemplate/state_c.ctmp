@@ -6,17 +6,21 @@
  */
 
 #include "../fsm.h" 
-#include "$state$_func.c"
+#include "$state_name$_func.c"
  
-static const char* s_fsm_name = "$state$"; 
+static const char* s_fsm_name = "$state_name$"; 
+static const int s_timeout = $state_timeout$; 
 
 static ge_fsm_state_st* get_next_status(int event_id){
-	$switch_next_status$
+	switch(event_id){
+		$switch_next_status$
+		default:
+			return -1;
+	}
+	
 }
 
-int do_action(fsm_event_st* event){
-	$swith_event_function$
-}
+
 
 void $fsmName_init_state_func$(ge_fsm_state_st* state){
 	state->name = s_fsm_name;
@@ -27,4 +31,10 @@ void $fsmName_init_state_func$(ge_fsm_state_st* state){
 	state->timeout = s_timeout;
  }
  
- 
+static int do_action(fsm_event_st* event){
+	switch(event.event_id){
+	$event_handler$
+	default:
+		return FAS_IGNORE;
+	}
+}

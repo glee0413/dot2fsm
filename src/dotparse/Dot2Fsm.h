@@ -29,6 +29,8 @@ public:
 			this->m_nextState = nextState;
 		}
 		StateTransfer(){}
+		string EventName(){return this->m_eventName;}
+		string NextState(){return this->m_nextState;}
 	private:
 		string m_eventName;
 		string m_nextState;
@@ -40,6 +42,7 @@ public:
 	int generalFSMCode(int language);
 private:
 	int generalFSMCode_C();
+	int generalStateCode_C();
 	int createFSMDir();
 	int buildReplaceString(map<int,string>& replace_str);
 private:
