@@ -38,13 +38,19 @@ public:
 
 	};
 public:
+	enum DotFsmEnumType{
+		DFET_EVENT = 0,
+		DFET_STATE
+	};
+public:
 	int parseDotFile(const char* dotFile);
 	int generalFSMCode(int language);
 private:
 	int generalFSMCode_C();
-	int generalStateCode_C();
+	int generalStateCode_C(map<int,string>& replace_str);
 	int createFSMDir();
 	int buildReplaceString(map<int,string>& replace_str);
+	string GetFSMEnumName(string read_name,DotFsmEnumType type);
 private:
 	int m_stateCount;
 	string m_fsmName;

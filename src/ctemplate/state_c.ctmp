@@ -13,7 +13,7 @@ static const int s_timeout = $state_timeout$;
 
 static ge_fsm_state_st* get_next_status(int event_id){
 	switch(event_id){
-		$switch_next_status$
+$switch_next_status$
 		default:
 			return -1;
 	}
@@ -33,8 +33,8 @@ void $fsmName_init_state_func$(ge_fsm_state_st* state){
  
 static int do_action(fsm_event_st* event){
 	switch(event.event_id){
-	$event_handler$
-	default:
-		return FAS_IGNORE;
+$event_handler$
+		default:
+			return FAS_IGNORE;
 	}
 }

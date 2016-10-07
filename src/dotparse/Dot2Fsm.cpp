@@ -102,6 +102,7 @@ Dot2Fsm::parseDotFile(const char* dotFile){
 			this->m_stateTransfer[agnameof(np)].push_back(StateTransfer(event,next_state));
 
 			if(find(m_eventList.begin(), m_eventList.end(), event) == m_eventList.end()){
+				//TODO: skip blank
 				m_eventList.push_back(agget(ep,label_str));
 			}
 		}
@@ -161,6 +162,19 @@ int Dot2Fsm::createFSMDir(){
 		return 0;
 }
 
+string Dot2Fsm::GetFSMEnumName(string real_name,DotFsmEnumType type){
+	string enum_name ;
+	if(DFET_EVENT == type){
+		enum_name = this->m_fsmName + "_" + "event_"  + real_name;
+	}else if(DFET_STATE == type){
+		enum_name = this->m_fsmName + "_" + "state_"  + real_name;
+	}else{
+		printf("[%s %d] type is invalid\n",__FUNCTION__,__LINE__);
+	}
+	StringUtils::toUpper(enum_name);
+	return enum_name;
+}
+
 int Dot2Fsm::buildReplaceString(map<int,string>& replace_str){
 	replace_str[EFTT_FSM_H_FSMNAME] = this->m_fsmName;
 	replace_str[EFTT_FSM_H_FSMUPNAME] = this->m_fsmName;
@@ -170,10 +184,10 @@ int Dot2Fsm::buildReplaceString(map<int,string>& replace_str){
 	for (vector<string>::iterator it = this->m_stateList.begin();
 			it != this->m_stateList.end(); it++) {
 		string state_upcase = *it;
-		string state_enum = replace_str[EFTT_FSM_H_FSMUPNAME] + "_" + state_upcase;
-
+		//string state_enum = replace_str[EFTT_FSM_H_FSMUPNAME] + "_" + state_upcase;
+		string state_enum = this->GetFSMEnumName(*it,DFET_STATE);
 		StringUtils::toUpper(state_upcase);
-		StringUtils::toUpper(state_enum);
+		//StringUtils::toUpper(state_enum);
 
 		if (it == this->m_stateList.begin()) {
 			replace_str[EFTT_FSM_H_STATE_LIST] = state_enum + " = 0,\n";
@@ -183,7 +197,7 @@ int Dot2Fsm::buildReplaceString(map<int,string>& replace_str){
 		}
 
 		replace_str[EFTT_STATE_FSMNAME_INIT_STATE_FUNC] = this->m_fsmName
-				+ "_int_" + *it;
+				+ "_init_" + *it;
 
 		if (it != this->m_stateList.begin()) {
 			replace_str[EFTT_FSM_C_STATE_INIT_FUNC_LIST] += "\t";
@@ -199,17 +213,16 @@ int Dot2Fsm::buildReplaceString(map<int,string>& replace_str){
 
 	for (vector<string>::iterator it = this->m_eventList.begin();
 			it != this->m_eventList.end(); it++) {
-		string event_upcase = *it;
-		StringUtils::toUpper(event_upcase);
+		//string event_upcase = *it;
+		string event_upcase = this->GetFSMEnumName(*it,DFET_EVENT);
+		//StringUtils::toUpper(event_upcase);
 
 		if (it == this->m_eventList.begin()) {
 			replace_str[EFTT_FSM_H_EVENT_LIST] =
-					replace_str[EFTT_FSM_H_FSMUPNAME] + "_" + event_upcase
-							+ " = 0,\n";
+					event_upcase + " = 0,\n";
 		} else {
 			replace_str[EFTT_FSM_H_EVENT_LIST] +=
-					"\t" + replace_str[EFTT_FSM_H_FSMUPNAME] + "_" + event_upcase
-							+ ",\n";
+					"\t" + event_upcase + ",\n";
 		}
 	}
 
@@ -221,18 +234,18 @@ int Dot2Fsm::buildReplaceString(map<int,string>& replace_str){
 	return 0;
 }
 
-int Dot2Fsm::generalStateCode_C(){
-	map<int,string> replace_str;
+int Dot2Fsm::generalStateCode_C(map<int,string>& replace_str){
+	//map<int,string> replace_str;
 
-	if(chdir(this->m_fsmName.c_str())){
-		printf("change directory %s failed\n",this->m_fsmName.c_str());
-		return -1;
-	}
+//	if(chdir(this->m_fsmName.c_str())){
+//		printf("change directory %s failed\n",this->m_fsmName.c_str());
+//		return -1;
+//	}
 
 
 
-	for (vector<string>::iterator it = this->m_stateFileName.begin();
-				it != this->m_stateFileName.end(); it++) {
+	for (vector<string>::iterator it = this->m_stateList.begin();
+				it != this->m_stateList.end(); it++) {
 
 		string filename = *it + "_state.h";
 		fstream local_state_h(filename.c_str(), ios::out);
@@ -249,23 +262,25 @@ int Dot2Fsm::generalStateCode_C(){
 
 		replace_str[EFTT_STATE_C_STATE_NAME] = *it;
 		//this->m_stateTransfer
+		replace_str[EFTT_STATE_C_SWITCH_NEXT_STATUS].clear();
+		replace_str[EFTT_STATE_C_EVENT_HANDLER].clear();
 		vector<StateTransfer> stateTransfer = this->m_stateTransfer[*it];
 		for(vector<StateTransfer>::iterator iter = stateTransfer.begin();
 				iter != stateTransfer.end();iter++){
 			//"case a: b; break;"
-			replace_str[EFTT_STATE_C_SWITCH_NEXT_STATUS] = "\tcase ";
-			replace_str[EFTT_STATE_C_SWITCH_NEXT_STATUS] += iter->EventName();
-			replace_str[EFTT_STATE_C_SWITCH_NEXT_STATUS] += ":\n\t\treturn ";
-			replace_str[EFTT_STATE_C_SWITCH_NEXT_STATUS] += iter->NextState();
-			replace_str[EFTT_STATE_C_SWITCH_NEXT_STATUS] += ";";
+			replace_str[EFTT_STATE_C_SWITCH_NEXT_STATUS] += "\n\t\tcase ";
+			replace_str[EFTT_STATE_C_SWITCH_NEXT_STATUS] += this->GetFSMEnumName(iter->EventName(),DFET_EVENT);
+			replace_str[EFTT_STATE_C_SWITCH_NEXT_STATUS] += ":\n\t\t\treturn ";
+			replace_str[EFTT_STATE_C_SWITCH_NEXT_STATUS] += this->GetFSMEnumName(iter->NextState(),DFET_STATE);
+			replace_str[EFTT_STATE_C_SWITCH_NEXT_STATUS] += ";\n";
 
-			replace_str[EFTT_STATE_C_EVENT_HANDLER] = "\tcase ";
-			replace_str[EFTT_STATE_C_EVENT_HANDLER] += iter->EventName() + ":\nt\treturn ";
+			replace_str[EFTT_STATE_C_EVENT_HANDLER] += "\n\t\tcase ";
+			replace_str[EFTT_STATE_C_EVENT_HANDLER] += this->GetFSMEnumName(iter->EventName(),DFET_EVENT) + ":\n\t\t\treturn ";
 			replace_str[EFTT_STATE_C_EVENT_HANDLER] += iter->EventName();
-			replace_str[EFTT_STATE_C_EVENT_HANDLER] += "_handler(event);";
+			replace_str[EFTT_STATE_C_EVENT_HANDLER] += "_handler(event);\n";
 		}
 		//TODO:change real timeout
-		replace_str[EFTT_STATE_C_STATE_TIMEOUT] += "-1";
+		replace_str[EFTT_STATE_C_STATE_TIMEOUT] = "-1";
 
 		for(int i = EFIT_STATE_START;i < EFIT_STATE_END; i++){
 			StringUtils::replaceAll(str_state_h,fsm_template_token[i],replace_str[i]);
@@ -273,6 +288,14 @@ int Dot2Fsm::generalStateCode_C(){
 			StringUtils::replaceAll(str_state_func,fsm_template_token[i],replace_str[i]);
 
 		}
+
+		local_state_h << str_state_h;
+		local_state_c << str_state_c;
+		local_state_func_c << str_state_func;
+
+		local_state_h.close();
+		local_state_c.close();
+		local_state_func_c.close();
 	}
 
 //	switch(i){
@@ -321,8 +344,7 @@ int Dot2Fsm::generalFSMCode_C(){
 	local_fsm_h.close();
 	local_fsm_c.close();
 
-	this->generalStateCode_C();
-	return 0;
+	this->generalStateCode_C(replace_str);
 
 	return 0;
 }
